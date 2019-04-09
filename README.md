@@ -1,6 +1,6 @@
 ## Documentação e Software  
 
-Suporte às atividades da disciplina Robótica Competitiva 2019/1 para as equipes envolvidas no desenvolvimento de firmware de robôs da categoria IEEE Very Small Size Soccer.
+**Suporte às atividades da disciplina Robótica Competitiva 2019/1 para as equipes envolvidas no desenvolvimento de firmware de robôs da categoria IEEE Very Small Size Soccer**.
 
 ### **Conteúdo:**
 
