@@ -63,7 +63,7 @@ typedef struct {
 
 TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
 
-
+uint32_t  blinker;		// Contagem de alterações de estado do LED
 
 
 /* ******************************************************************* */
@@ -92,6 +92,7 @@ void setup() {
 
     SPI.begin();                        // Inicializa a interface SPI
 
+    blinker = 0;						// Inicialização da variável
 }
 
 
@@ -144,7 +145,14 @@ void tasks_1000ms( void ) {
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-
+		// Conta execuções
+        blinker++;
+        // Escreve "bit 0" de "blinker" para o LED 
+        digitalWrite(LED, bitRead(blinker, 0));
+        
+        // Serial.write(blinker);  // Escreve dados binários na porta serial
+        // Serial.print(blinker);  // Imprime dados na porta serial como texto ASCII
+        Serial.println(blinker);   // Idem ao "print", adicionando EOL ao string
     
     }
 }
