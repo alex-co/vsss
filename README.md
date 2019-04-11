@@ -9,7 +9,7 @@
 
 **[base](base/):** documentação e firmware do nó base;  
 
-**[robot](robo/):** documentação e firmware dos robôs. 
+**[robot](robot/):** documentação e firmware dos robôs. 
 
 **[img](img/):** imagens diversas (informativas e integrantes da documentação).
 
