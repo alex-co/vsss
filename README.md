@@ -2,16 +2,18 @@
 
 **Suporte às atividades da disciplina Robótica Competitiva 2019/1 para as equipes envolvidas no desenvolvimento de firmware de robôs da categoria IEEE Very Small Size Soccer**.
 
-### **Conteúdo:**
+**Objeto de estudo:** *Robô Capivara VSSS V1*
+
+### **Conteúdo deste repositório:**
 
 
 **[base](base/):** documentação e firmware do nó base;  
 
 **[robot](robo/):** documentação e firmware dos robôs. 
 
-**[img](img/):** imagens diversas (parte da documentação).
+**[img](img/):** imagens diversas (informativas e integrantes da documentação).
 
-**[exemplos](exemplos/):** exemplos didáticos e funcionais. 
+**[exemplos](exemplos/):** exemplos didáticos e funcionais abrangendo os firmwares do robô e do rádio base. 
 
 
 ## IEEE Very Small Size Soccer (VSSS)
