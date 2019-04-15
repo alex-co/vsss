@@ -3,8 +3,13 @@
 Este arquivo descreve atividades práticas a serem realizadas na disciplina Robótica Competitiva I 2019/1.
 
 
-Nota: O robô assim como o rádio base têm embarcados o Arduino Pro Mini (Atmega328 - 5V). Para fins didáticos, será usada como referência a linguagem do Arduino. Fica livre para ser usada a linguagem C específica para o microcontrolador Atmega328, no entanto o código gerado deve ser ser compatível para ser compilado e carregado na memória do microcontrolador usando a IDE do Arduino.
-Existe vasto material na internet, tutoriais com exemplos de código que tratam dos assuntos aqui abordados. Use e abuse da busca do Google. Qualquer exemplo encontrado que referencie as placas de Arduino que usem o microcontrolador Atmega328 são válidos. 
+Nota: O robô assim como o rádio base têm embarcados o Arduino Pro Mini (Atmega328 - 5V). Para fins didáticos, 
+será usada como referência a linguagem do Arduino. Fica livre para ser usada a linguagem C específica para o 
+microcontrolador Atmega328, no entanto o código gerado deve ser ser compatível para ser compilado e carregado 
+na memória do microcontrolador usando a IDE do Arduino.
+Existe vasto material na internet, tutoriais com exemplos de código que tratam dos assuntos aqui abordados. 
+Use e abuse da busca do Google. Qualquer exemplo encontrado que referencie as placas de Arduino que usem o 
+microcontrolador Atmega328 são válidos. 
 
 Documentação de Referência da Linguagem Arduino:
 https://www.arduino.cc/reference/pt/
@@ -17,7 +22,8 @@ INTRODUÇÃO:
 - O que é firmware? Como ele se diferencia de um software genérico produzido para ser executado num PC?
 
 
-O template "robot/robot.ino" tem implemetado um escalonador de tarefas (não preemptivo) bastante simples que prevê três tipos diferentes de prioridades de tarefas para o gerenciamento das rotinas do robô.
+O template "robot/robot.ino" tem implemetado um escalonador de tarefas (não preemptivo) bastante simples 
+que prevê três tipos diferentes de prioridades de tarefas para o gerenciamento das rotinas do robô.
 
 - Quais as principais diferenças entre usar e não usar um escalonador de tarefas no firmware do robô?
 
@@ -30,7 +36,8 @@ PRÁTICA:
 PARTE 1 - Ambiente e funções elementares de leitura e escrita em pinos de I/O:
 
 
-1.1) O arquivo "exemplos/escalonador/escalonador.ino" tem implementado uma rotina que faz o LED da placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segundos).
+1.1) O arquivo "exemplos/escalonador/escalonador.ino" tem implementado uma rotina que faz o LED da 
+placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segundos).
 
     Mapeamento do pino do LED (linha 29 em "escalonador.ino"): 
     #define LED 4 
@@ -59,14 +66,19 @@ PARTE 1 - Ambiente e funções elementares de leitura e escrita em pinos de I/O:
     Mapeamento do pino do "sensor" de bateria (linha 48 em "escalonador.ino"):
     #define VOLT_BAT   A7      // Tensão da bateria -> Vcc/10
     
-    Obs: Note que o conversor analógico-digital usa referência interna de 1.1V (linha 91 em "escalonador.ino") e o valor medido representa 1/10 do valor real das baterias.
+    Obs: Note que o conversor analógico-digital usa referência interna de 1.1V (linha 91 em "escalonador.ino") 
+    e o valor medido representa 1/10 do valor real das baterias.
     
-  - Quais as implicações caso seja alterada a referência (fundo de escala) do conversor analógico-digital de 1.1V para 5.0V?
+  - Quais as implicações caso seja alterada a referência (fundo de escala) do conversor analógico-digital 
+    de 1.1V para 5.0V?
 
   - É possível usar outra tensão de referência para o conversor além de 1.1V ou 5V? Como?
 
     
-1.4) Implemente uma função que conte quantas vezes algum objeto passa pelos encoders (barreira óptica). O LED do robô deve refletir o estado dos encoders, ou seja, enquanto a barreira estiver interropida o LED deve permanecer aceso ou permanecer apagado quando a barreira óptica estiver livre. As respectivas contagens devem ser transmitidas via interface serial.
+1.4) Implemente uma função que conte quantas vezes algum objeto passa pelos encoders (barreira óptica). 
+     O LED do robô deve refletir o estado dos encoders, ou seja, enquanto a barreira estiver interropida 
+     o LED deve permanecer aceso ou permanecer apagado quando a barreira óptica estiver livre. 
+     As respectivas contagens devem ser transmitidas via interface serial.
 
     void status_encoders( uint16_t *count_enc_a, uint16_t *count_enc_b);
     
@@ -75,13 +87,15 @@ PARTE 1 - Ambiente e funções elementares de leitura e escrita em pinos de I/O:
     #define IRQ_ENC_B   3      // Pino de interrupção do Encoder B
     
     
-1.5) Implemente duas funções, para o monitoramento dos dois encoders, com funcionalidades análogas das do item 1.4 porém usando interrupção externa. 
+1.5) Implemente duas funções, para o monitoramento dos dois encoders, com funcionalidades análogas 
+     do item 1.4 porém usando interrupção externa. 
 
     void task_irq_encoder_a( void );
     void task_irq_encoder_b( void );
 
   - Em quais situações se fazem úteis (ou necessárias) o uso de interrupções externas de hardware?
-  - Existem módulos de hardware do robô, além dos encoders, que poderiam ser tratados usando interrupção? Quais?
+  - Existem módulos de hardware do robô, além dos encoders, que poderiam ser tratados usando 
+    interrupção? Quais?
 
 
 
