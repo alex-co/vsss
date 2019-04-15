@@ -1,0 +1,106 @@
+
+
+Este arquivo descreve atividades práticas a serem realizadas na disciplina Robótica Competitiva I 2019/1.
+
+
+Nota: O robô assim como o rádio base têm embarcados o Arduino Pro Mini (Atmega328 - 5V). Para fins didáticos, será usada como referência a linguagem do Arduino. Fica livre para ser usada a linguagem C específica para o microcontrolador Atmega328, no entanto o código gerado deve ser ser compatível para ser compilado e carregado na memória do microcontrolador usando a IDE do Arduino.
+Existe vasto material na internet, tutoriais com exemplos de código que tratam dos assuntos aqui abordados. Use e abuse da busca do Google. Qualquer exemplo encontrado que referencie as placas de Arduino que usem o microcontrolador Atmega328 são válidos. 
+
+Documentação de Referência da Linguagem Arduino:
+https://www.arduino.cc/reference/pt/
+
+
+INTRODUÇÃO:
+
+- Quais as diferenças elementares entre um microcontrolador e um microprocessador?
+
+- O que é firmware? Como ele se diferencia de um software genérico produzido para ser executado num PC?
+
+
+O template "robot/robot.ino" tem implemetado um escalonador de tarefas (não preemptivo) bastante simples que prevê três tipos diferentes de prioridades de tarefas para o gerenciamento das rotinas do robô.
+
+- Quais as principais diferenças entre usar e não usar um escalonador de tarefas no firmware do robô?
+
+- Há necessidade de se usar um escalonador de tarefas preemptivo para o firmware? Justifique.
+
+
+PRÁTICA:
+
+========================================================================
+PARTE 1 - Ambiente e funções elementares de leitura e escrita em pinos de I/O:
+
+
+1.1) O arquivo "exemplos/escalonador/escalonador.ino" tem implementado uma rotina que faz o LED da placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segundos).
+
+    Mapeamento do pino do LED (linha 29 em "escalonador.ino"): 
+    #define LED 4 
+
+1.1a) Modifique o código fonte para que não sejam necessárias chamadas de funções na execução do escalonador.
+
+1.1b) Com alterações mínimas no código, faça o LED piscar com ciclos de 0.8s, 1.6s, 3.2s, 4s e 8s.
+      A contagem dos ciclos devem ser transmitida via interface serial.
+
+
+1.2) Implemente uma função que leia o endereço de HW (rádio) do robô.
+     O endereço lido deve ser transmitido via interface serial.
+
+    uint8_t get_node_addr( void );
+    
+    Mapeamento dos pinos do Dipswitch (linhas 33 e 34 em "escalonador.ino"):
+    #define RADIO_A0   A4      // Bit 0 do end. do rádio (LOW = ligado)
+    #define RADIO_A1   A5      // Bit 1 do end. do rádio (LOW = ligado)
+
+    
+1.3) Implemente uma função que leia a tensão das baterias, em milivolts.
+     O valor obtido deve ser transmitido via interface serial.
+
+    uint16_t get_volt_bat( void );
+
+    Mapeamento do pino do "sensor" de bateria (linha 48 em "escalonador.ino"):
+    #define VOLT_BAT   A7      // Tensão da bateria -> Vcc/10
+    
+    Obs: Note que o conversor analógico-digital usa referência interna de 1.1V (linha 91 em "escalonador.ino") e o valor medido representa 1/10 do valor real das baterias.
+    
+  - Quais as implicações caso seja alterada a referência (fundo de escala) do conversor analógico-digital de 1.1V para 5.0V?
+
+  - É possível usar outra tensão de referência para o conversor além de 1.1V ou 5V? Como?
+
+    
+1.4) Implemente uma função que conte quantas vezes algum objeto passa pelos encoders (barreira óptica). O LED do robô deve refletir o estado dos encoders, ou seja, enquanto a barreira estiver interropida o LED deve permanecer aceso ou permanecer apagado quando a barreira óptica estiver livre. As respectivas contagens devem ser transmitidas via interface serial.
+
+    void status_encoders( uint16_t *count_enc_a, uint16_t *count_enc_b);
+    
+    Mapeamento dos pinos de sinal dos encoders (linhas 36 e 37 em "escalonador.ino"):
+    #define IRQ_ENC_A   2      // Pino de interrupção do Encoder A
+    #define IRQ_ENC_B   3      // Pino de interrupção do Encoder B
+    
+    
+1.5) Implemente duas funções, para o monitoramento dos dois encoders, com funcionalidades análogas das do item 1.4 porém usando interrupção externa. 
+
+    void task_irq_encoder_a( void );
+    void task_irq_encoder_b( void );
+
+  - Em quais situações se fazem úteis (ou necessárias) o uso de interrupções externas de hardware?
+  - Existem módulos de hardware do robô, além dos encoders, que poderiam ser tratados usando interrupção? Quais?
+
+
+
+========================================================================
+PARTE 2 - Atuação dos motores em laço aberto
+
+...
+
+
+
+========================================================================
+PARTE 3 - Atuação dos motores em laço fechado
+
+...
+
+
+
+========================================================================
+PARTE 4 - Controlando o robô via rádio
+
+...
+
