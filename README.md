@@ -13,6 +13,8 @@
 
 **[exemplos](exemplos/):** exemplos didáticos e funcionais abrangendo os firmwares do robô e do rádio base. 
 
+**[Atividades.txt](Atividades.txt):** atividades práticas a serem desenvolvidas ao longo do semestre.
+
 ## Objeto e objetivo:
 
 **Objeto de estudo:** *Robô Capivara VSSS V1*
