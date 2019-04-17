@@ -56,6 +56,16 @@ placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segu
     Mapeamento dos pinos do Dipswitch (linhas 33 e 34 em "escalonador.ino"):
     #define RADIO_A0   A4      // Bit 0 do end. do rádio (LOW = ligado)
     #define RADIO_A1   A5      // Bit 1 do end. do rádio (LOW = ligado)
+    
+    Nota: Para o funcionamento adequado do endereçamento feito através do dipswitch da placa
+          do robô é necessário ativar os resistores internos de pull-up dos respectivos pinos
+          do microcontrolador, caso contrário a leitura dos pinos será sempre nível o lógico 0.
+
+    // Inicialização dos pinos de endereçamento do rádio
+    pinMode(RADIO_A0, INPUT_PULLUP);    // Endereço deste nó: bit 0
+    pinMode(RADIO_A1, INPUT_PULLUP);    // Endereço deste nó: bit 1
+    
+    https://www.arduino.cc/reference/pt/language/functions/digital-io/pinmode/
 
     
 1.3) Implemente uma função que leia a tensão das baterias, em milivolts.
