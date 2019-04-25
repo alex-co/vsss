@@ -112,8 +112,70 @@ placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segu
 ========================================================================
 PARTE 2 - Atuação dos motores em laço aberto
 
-...
+Considere o seguinte mapeamento de hardware entre o Arduino e a Ponte H e a estrutura de dados
+que contém os parâmetros de controle da Ponte H (ambos contidos no template "robot/robot.ino"): 
 
+
+#define HBRID_EN    6      // Habilita a ponte H (High)
+#define MTR_AIN1   A2      // Bit 0 - Controle da ponte H do Motor A
+#define MTR_AIN2   A3      // Bit 1 - Controle da ponte H do Motor A
+#define MTR_BIN1   A1      // Bit 0 - Controle da ponte H do Motor B
+#define MTR_BIN2   A0      // Bit 1 - Controle da ponte H do Motor B
+#define MTR_PWMA    9      // Sinal de PWM para controle  do Motor A
+#define MTR_PWMB   10      // Sinal de PWM para controle  do Motor B
+
+
+typedef union {
+    struct {
+        uint8_t  pwm_motor_B;        // (bits 0-7)   8 bits: Valor do PWM do Motor B
+        uint8_t  pwm_motor_A;        // (bits 8-15)  8 bits: Valor do PWM do Motor A
+        uint8_t  dir_motor_B : 2,    // (bits 16-17) 2 bits: BIN1 e BIN2  da ponte H
+                 dir_motor_A : 2,    // (bits 18-19) 2 bits: AIN1 e AIN2  da ponte H
+                 ign1_4b     : 4;    // (bits 20-23) 4 bits não utilizados (padding)
+        uint8_t  ign2_8b;            // (bits 24-31) 8 bits não utilizados (padding)
+    } config;
+    uint32_t status = 0;             // Leitura/Escrita simuntânea do conjunto de variáveis.
+} TMotCtrl;
+
+
+
+2.1) Implemente uma função que receba um inteiro sem sinal de 32 bits e altera os estados
+     dos dois motores simultaneamente. 
+
+    void set_motor_status( uint32_t );
+    
+    
+2.2) Implemente uma função que retorne um inteiro de 32 bits contendo o estado atual
+     dos dois motores.
+     
+    uint32_t get_motor_status( void );
+    
+    
+Considere as seguintes definições, contidas no template "robot/robot.ino":
+
+    #define PWM_MIN  0x0F   // PWM mín. p/ garantir movimento das duas rodas
+    #define PWM_MAX  0x9F   // PWM máx. para que os motores tenham aprox. 5V
+    
+    
+2.3) Altere a função definida na questão 2.1 para que, ao se determinar o valor de PWM
+     dos motores, estes nunca ultrapassem o valor definido por PWM_MAX.
+     
+     
+2.4) Implemente uma função que receba como parâmetro a identificação de um dos motores
+     e retorne um booleano informando se o motor está com o freio elétrico ativado.
+     
+    bool is_motor_breaked( uint8_t );
+    
+    
+2.5) Implemente uma função que ajuste dinamicamente o valor do PWM máximo permitido de acordo
+     com o valor de tensão das baterias (use a função implementada no item 1.3) de forma que 
+     os motores nunca trabalhem com mais de 5 volts. A função deve retornar o valor calculado.
+     
+     Obs: Note que a estrutura "TMotCtrl" possui bits não utilizados. Use estes bits conforme
+          for conveniênte para armazenar o valor do PWM máximo calculado pela função.
+
+    uint8_t set_pwm_max( void );
+    
 
 
 ========================================================================
