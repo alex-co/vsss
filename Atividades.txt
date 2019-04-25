@@ -54,8 +54,8 @@ placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segu
     uint8_t get_node_addr( void );
     
     Mapeamento dos pinos do Dipswitch (linhas 33 e 34 em "escalonador.ino"):
-    #define RADIO_A0   A4      // Bit 0 do end. do rádio (LOW = ligado)
-    #define RADIO_A1   A5      // Bit 1 do end. do rádio (LOW = ligado)
+    #define RADIO_A0   A4      // Bit 0 do end. do rádio (LOW = ligado / Ativar pull-up)
+    #define RADIO_A1   A5      // Bit 1 do end. do rádio (LOW = ligado / Ativar pull-up)
     
     Nota: Para o funcionamento adequado do endereçamento feito através do dipswitch da placa
           do robô é necessário ativar os resistores internos de pull-up dos respectivos pinos
@@ -93,8 +93,8 @@ placa piscar na frequência de 0.5 Hz ( t(s) = 1/f(Hz) => um ciclo a cada 2 segu
     void status_encoders( uint16_t *count_enc_a, uint16_t *count_enc_b);
     
     Mapeamento dos pinos de sinal dos encoders (linhas 36 e 37 em "escalonador.ino"):
-    #define IRQ_ENC_A   2      // Pino de interrupção do Encoder A
-    #define IRQ_ENC_B   3      // Pino de interrupção do Encoder B
+    #define IRQ_ENC_A   2      // Pino de interrupção do Encoder A (Ativar pull-up)
+    #define IRQ_ENC_B   3      // Pino de interrupção do Encoder B (Ativar pull-up)
     
     
 1.5) Implemente duas funções, para o monitoramento dos dois encoders, com funcionalidades análogas 
@@ -139,7 +139,7 @@ typedef union {
 
 
 
-2.1) Implemente uma função que receba um inteiro sem sinal de 32 bits e altera os estados
+2.1) Implemente uma função que receba um inteiro sem sinal de 32 bits e altere os estados
      dos dois motores simultaneamente. 
 
     void set_motor_status( uint32_t );
@@ -153,8 +153,8 @@ typedef union {
     
 Considere as seguintes definições, contidas no template "robot/robot.ino":
 
-    #define PWM_MIN  0x0F   // PWM mín. p/ garantir movimento das duas rodas
-    #define PWM_MAX  0x9F   // PWM máx. para que os motores tenham aprox. 5V
+    #define PWM_MIN  0x0F   // PWM mín. para garantir um movimento mínimo dos motores
+    #define PWM_MAX  0x9F   // PWM máx. p/ que os motores tenham aprox. 5v (Bat = 8.4v)
     
     
 2.3) Altere a função definida na questão 2.1 para que, ao se determinar o valor de PWM
@@ -164,7 +164,7 @@ Considere as seguintes definições, contidas no template "robot/robot.ino":
 2.4) Implemente uma função que receba como parâmetro a identificação de um dos motores
      e retorne um booleano informando se o motor está com o freio elétrico ativado.
      
-    bool is_motor_breaked( uint8_t );
+    bool is_motor_locked( uint8_t );
     
     
 2.5) Implemente uma função que ajuste dinamicamente o valor do PWM máximo permitido de acordo
@@ -172,7 +172,7 @@ Considere as seguintes definições, contidas no template "robot/robot.ino":
      os motores nunca trabalhem com mais de 5 volts. A função deve retornar o valor calculado.
      
      Obs: Note que a estrutura "TMotCtrl" possui bits não utilizados. Use estes bits conforme
-          for conveniênte para armazenar o valor do PWM máximo calculado pela função.
+          for conveniente para armazenar o valor do PWM calculado pela função.
 
     uint8_t set_pwm_max( void );
     
