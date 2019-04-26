@@ -1,8 +1,6 @@
 
+#include <avr/io.h>
 #include <avr/pgmspace.h>
-#include <RF24Network.h>
-#include <RF24.h>
-#include <SPI.h>
 
 /* ****************************************************************** */
 /* *** Definições diversas ****************************************** */
@@ -11,17 +9,6 @@
 // => Necessário com os motores montados simetricamente
 
 #define SSPEED        115200   // Velocidade da interface serial
-
-#define FULL_BAT        8000   // Valor em mV para bat. completamente carregada
-#define DEAD_BAT        6000   // Valor em mV para bat. esgotada ( recarregar )
-
-/* ****************************************************************** */
-/* Limitações de PWM e velocidade para uso no controlador PID ******* */
-
-#define PWM_MIN         0x0F   // PWM mín. p/ garantir movimento das duas rodas
-#define PWM_MAX         0x9F   // PWM máx. para que os motores tenham aprox. 5V
-#define SPD_MIN           50   // Vel. mín. em mm/s ( Condição: PWM > PWM_MIN )
-#define SPD_MAX          500   // Vel. máx. em mm/s ( Condição: PWM < PWM_MAX )
 
 /* ****************************************************************** */
 /* Estas são as conexões de hardware mapeadas aos pinos do Arduino ** */
@@ -88,11 +75,7 @@ void setup() {
     pinMode(LED, OUTPUT);               // Pino do LED como saída digital
     digitalWrite(LED, LOW);
     
-    analogReference(INTERNAL);          // Referência dos ADCs -> 1.1V
-
-    SPI.begin();                        // Inicializa a interface SPI
-
-    blinker = 0;						// Inicialização da variável
+    blinker = 0;                       // Inicialização da variável global
 }
 
 
