@@ -1,10 +1,11 @@
 /*
-*	Exemplo referente a questão 1.2 de Atividades.txt
+*	Exemplo referente a questão 1.4 de Atividades.txt
 * 
-*  - Lê o endereço de rádio, definido pelo dipswitch
+*  - Contagem de interrupções na barreira óptica dos encoders.
+*  - O LED da placa sinaliza o estado dos encoders.
 * 
-*    Objetivo: Trabalhar com pinos individuais de I/O.
-*
+*    Objetivos: 1. Detecção de evento por bordas vs por nível.
+*               2. Ponteiros como argumentos de funções.
 */
 /* ****************************************************************** */
 
@@ -14,13 +15,6 @@
 /* ****************************************************************** */
 /* *** Definições diversas ****************************************** */
 
-// =================================================================== //
-// Ref Ex 1.2 - Descomentar somente uma das definições abaixo por vez:
-
-//#define RD_PINS		// Lê pinos de I/O individualmente
-#define RD_PORT		// Lê PORTC ( PINC ) do Atmega328
-
-// =================================================================== //
 
 #define SSPEED        115200   // Velocidade da interface serial
 
@@ -62,13 +56,20 @@ typedef struct {
 /* *** Variáveis globais e instanciações ***************************** */
 
 
-TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
+TasksTCtr tasks;   // Contagem de tempo para execução de tarefas
+
+uint16_t count_enc_a = 0;
+uint16_t count_enc_b = 0;
+uint16_t prev_enc_a = 0;
+uint16_t prev_enc_b = 0;
+uint8_t  aux_a = 0;
+uint8_t  aux_b = 0;
 
 
 /* ******************************************************************* */
 /* *** Protótipos das funções **************************************** */
 
-uint8_t get_node_addr( void );
+void status_encoders(uint16_t&, uint16_t&);
 
 
 /* ******************************************************************* */
@@ -76,11 +77,12 @@ uint8_t get_node_addr( void );
 
 void setup() {
 
-    Serial.begin(115200);   // Inicialização da com. serial
+    Serial.begin(115200);  // Inicialização da com. serial
     
-    // Inicialização dos pinos de endereçamento do rádio
-    pinMode(RADIO_A0, INPUT_PULLUP);    // Endereço deste nó: bit 0
-    pinMode(RADIO_A1, INPUT_PULLUP);    // Endereço deste nó: bit 1
+    pinMode(LED, OUTPUT);  // Pino do LED como saída digital
+    
+    pinMode(IRQ_ENC_A, INPUT_PULLUP);   // Sinal do Encoder A
+    pinMode(IRQ_ENC_B, INPUT_PULLUP);   // Sinal do Encoder B
     
 }
 
@@ -95,7 +97,7 @@ void loop() {
     if( (millis() - tasks.last_10ms) > 10 ){
         tasks.last_10ms = millis();
 
-
+        status_encoders( &count_enc_a, &count_enc_b);
 
 
     }
@@ -105,7 +107,21 @@ void loop() {
         tasks.last_100ms = millis();
 
 
-
+        if( digitalRead(IRQ_ENC_A) || digitalRead(IRQ_ENC_B))
+             digitalWrite(LED, HIGH);
+        else digitalWrite(LED, LOW);
+        
+        if( count_enc_a > prev_enc_a ){
+            prev_enc_a = count_enc_a;
+            Serial.print("Enc. A: ");
+            Serial.println(count_enc_a);
+        }
+        
+        if( count_enc_b > prev_enc_b ){
+            prev_enc_b = count_enc_b;
+            Serial.print("Enc. B: ");
+            Serial.println(count_enc_b);
+        }
 
     }
     // ******************************************************* //
@@ -113,9 +129,7 @@ void loop() {
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-		// Envia valor do end. de rário via serial
-		Serial.print("End. de rádio: ");
-		Serial.println( get_node_addr() );
+
 
     
     }
@@ -126,30 +140,21 @@ void loop() {
 /* ******************************************************************* */
 /* *** FUNÇÕES (implementações) ************************************** */
 
-uint8_t get_node_addr( void ){
+
+void status_encoders( uint16_t *count_enc_a, uint16_t *count_enc_b ) {
+
+    aux_a = aux_a << 1;
+    aux_a |= digitalRead(IRQ_ENC_A);
     
-   
-    // Abordagem: Leitura individual dos pinos
-    #ifdef RD_PINS
-	uint8_t addr = 0xFF;
-    addr  = addr << 1;
-    addr |= digitalRead(RADIO_A1);
-    addr  = addr << 1;
-    addr |= digitalRead(RADIO_A0);
-    addr = ~addr;
-    #endif
+    aux_b = aux_b << 1;
+    aux_b |= digitalRead(IRQ_ENC_B);
 
-    // Abordagem: Leitura do PORTC (PINC) do uC
-    // RADIO_A0 = Arduino A4 = uC pino 27 = PC4
-    // RADIO_A1 = Arduino A5 = uC pino 28 = PC5
-    #ifdef RD_PORT
-    uint8_t addr = 0;
-	addr |= PINC >> 4;
-	addr |= B11111100;
-	addr  = ~addr;
-    #endif
+    if( bitRead(aux_a,1) && !bitRead(aux_a,0) )
+        *count_enc_a = *count_enc_a + 1;
+        
+    if( bitRead(aux_b,1) && !bitRead(aux_b,0) )
+        *count_enc_b = *count_enc_b + 1;
 
-	return addr;
 }
 
 /* ****************************************************************** */

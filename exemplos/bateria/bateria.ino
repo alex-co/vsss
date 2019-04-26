@@ -1,9 +1,9 @@
 /*
-*	Exemplo referente a questão 1.2 de Atividades.txt
+*	Exemplo referente a questão 1.3 de Atividades.txt
 * 
-*  - Lê o endereço de rádio, definido pelo dipswitch
+*  - Lê a tensão da bateria em mV e transmite via serial.
 * 
-*    Objetivo: Trabalhar com pinos individuais de I/O.
+*    Objetivo: Utilizar conversor analógico-digital.
 *
 */
 /* ****************************************************************** */
@@ -14,13 +14,6 @@
 /* ****************************************************************** */
 /* *** Definições diversas ****************************************** */
 
-// =================================================================== //
-// Ref Ex 1.2 - Descomentar somente uma das definições abaixo por vez:
-
-//#define RD_PINS		// Lê pinos de I/O individualmente
-#define RD_PORT		// Lê PORTC ( PINC ) do Atmega328
-
-// =================================================================== //
 
 #define SSPEED        115200   // Velocidade da interface serial
 
@@ -68,7 +61,7 @@ TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
 /* ******************************************************************* */
 /* *** Protótipos das funções **************************************** */
 
-uint8_t get_node_addr( void );
+uint16_t get_volt_bat( void );
 
 
 /* ******************************************************************* */
@@ -76,11 +69,9 @@ uint8_t get_node_addr( void );
 
 void setup() {
 
-    Serial.begin(115200);   // Inicialização da com. serial
+    Serial.begin(115200);        // Inicialização da com. serial
     
-    // Inicialização dos pinos de endereçamento do rádio
-    pinMode(RADIO_A0, INPUT_PULLUP);    // Endereço deste nó: bit 0
-    pinMode(RADIO_A1, INPUT_PULLUP);    // Endereço deste nó: bit 1
+    analogReference(INTERNAL);   // Referência dos ADCs -> 1.1V
     
 }
 
@@ -113,10 +104,10 @@ void loop() {
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-		// Envia valor do end. de rário via serial
-		Serial.print("End. de rádio: ");
-		Serial.println( get_node_addr() );
-
+		// Envia tensão da bateria via serial
+		Serial.print("Bateria: ");
+		Serial.print( get_volt_bat() );
+		Serial.println("mV");
     
     }
     // ******************************************************* //
@@ -126,30 +117,19 @@ void loop() {
 /* ******************************************************************* */
 /* *** FUNÇÕES (implementações) ************************************** */
 
-uint8_t get_node_addr( void ){
+
+uint16_t get_volt_bat( ) {
+
+    uint16_t adc =  0;
+
+	// Valor lido pelo ADC = Vcc/10
+    for (int i = 0; i < 10; i++){
+        adc += analogRead(VOLT_BAT);
+        delayMicroseconds(100);
+    }
     
-   
-    // Abordagem: Leitura individual dos pinos
-    #ifdef RD_PINS
-	uint8_t addr = 0xFF;
-    addr  = addr << 1;
-    addr |= digitalRead(RADIO_A1);
-    addr  = addr << 1;
-    addr |= digitalRead(RADIO_A0);
-    addr = ~addr;
-    #endif
+    return (uint16_t)((adc*1.1/1023.0)*1000.0);
 
-    // Abordagem: Leitura do PORTC (PINC) do uC
-    // RADIO_A0 = Arduino A4 = uC pino 27 = PC4
-    // RADIO_A1 = Arduino A5 = uC pino 28 = PC5
-    #ifdef RD_PORT
-    uint8_t addr = 0;
-	addr |= PINC >> 4;
-	addr |= B11111100;
-	addr  = ~addr;
-    #endif
-
-	return addr;
 }
 
 /* ****************************************************************** */
