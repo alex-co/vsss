@@ -1,5 +1,5 @@
 /*
-*	Exemplo referente a questão 1.2 de Atividades.txt
+*  Exemplo referente a questão 1.2 de Atividades.txt
 * 
 *  - Lê o endereço de rádio, definido pelo dipswitch
 * 
@@ -17,8 +17,8 @@
 // =================================================================== //
 // Ref Ex 1.2 - Descomentar somente uma das definições abaixo por vez:
 
-//#define RD_PINS		// Lê pinos de I/O individualmente
-#define RD_PORT		// Lê PORTC ( PINC ) do Atmega328
+//#define RD_PINS      // Lê pinos de I/O individualmente
+#define RD_PORT      // Lê PORTC ( PINC ) do Atmega328
 
 // =================================================================== //
 
@@ -62,7 +62,7 @@ typedef struct {
 /* *** Variáveis globais e instanciações ***************************** */
 
 
-TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
+TasksTCtr tasks;        // Contagem de tempo para execução de tarefas
 
 
 /* ******************************************************************* */
@@ -79,8 +79,8 @@ void setup() {
     Serial.begin(115200);   // Inicialização da com. serial
     
     // Inicialização dos pinos de endereçamento do rádio
-    pinMode(RADIO_A0, INPUT_PULLUP);    // Endereço deste nó: bit 0
-    pinMode(RADIO_A1, INPUT_PULLUP);    // Endereço deste nó: bit 1
+    pinMode(RADIO_A0, INPUT_PULLUP);    // Endereço - bit 0
+    pinMode(RADIO_A1, INPUT_PULLUP);    // Endereço - bit 1
     
 }
 
@@ -113,9 +113,9 @@ void loop() {
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-		// Envia valor do end. de rário via serial
-		Serial.print("End. de rádio: ");
-		Serial.println( get_node_addr() );
+        // Envia valor do end. de rário via serial
+        Serial.print("End. de rádio: ");
+        Serial.println( get_node_addr() );
 
     
     }
@@ -131,7 +131,7 @@ uint8_t get_node_addr( void ){
    
     // Abordagem: Leitura individual dos pinos
     #ifdef RD_PINS
-	uint8_t addr = 0xFF;
+    uint8_t addr = 0xFF;
     addr  = addr << 1;
     addr |= digitalRead(RADIO_A1);
     addr  = addr << 1;
@@ -140,16 +140,16 @@ uint8_t get_node_addr( void ){
     #endif
 
     // Abordagem: Leitura do PORTC (PINC) do uC
-    // RADIO_A0 = Arduino A4 = uC pino 27 = PC4
-    // RADIO_A1 = Arduino A5 = uC pino 28 = PC5
+    // RADIO_A0 = Arduino A4 = uC pino 27 = PC4 (bit 4)
+    // RADIO_A1 = Arduino A5 = uC pino 28 = PC5 (bit 5)
     #ifdef RD_PORT
     uint8_t addr = 0;
-	addr |= PINC >> 4;
-	addr |= B11111100;
-	addr  = ~addr;
+    addr |= PINC >> 4;    // Lê todos os bits de PORTC e ajusta posição
+    addr |= B11111100;    // Todos os bits que não são de interesse tornam-se 1
+    addr  = ~addr;        // Inverte o byte (chave posição ON = nível lógico 0)
     #endif
 
-	return addr;
+    return addr;
 }
 
 /* ****************************************************************** */
