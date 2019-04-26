@@ -129,7 +129,7 @@ uint16_t get_volt_bat( ) {
         delayMicroseconds(100);
     }
     // Fundo de escala do ADC = 1.1V
-    // Resolução do ADC = 2^10
+    // Resolução do ADC = 10 bits (2^10)
     // Resultado em milivolts
     return (uint16_t)((adc*1.1/1023.0)*1000.0);
 
