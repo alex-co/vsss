@@ -1,5 +1,5 @@
 /*
-*	Exemplo referente a questão 1.5 de Atividades.txt
+*    Exemplo referente a questão 1.5 de Atividades.txt
 * 
 *  - Contagem de interrupções na barreira óptica dos encoders.
 *  - O LED da placa sinaliza o estado dos encoders.
@@ -56,12 +56,12 @@ typedef struct {
 /* *** Variáveis globais e instanciações ***************************** */
 
 
-TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
+TasksTCtr tasks;    // Contagem de tempo para execução de tarefas
 
-uint16_t count_enc_a = 0;
-uint16_t count_enc_b = 0;
-uint16_t prev_enc_a = 0;
-uint16_t prev_enc_b = 0;
+uint16_t count_enc_a = 0;    // Contagem de quebra de barreira do encoder A
+uint16_t count_enc_b = 0;    // Contagem de quebra de barreira do encoder B
+uint16_t prev_enc_a = 0;     // Auxiliar - Mudança de estado de count_enc_a
+uint16_t prev_enc_b = 0;     // Auxiliar - Mudança de estado de count_enc_b
 
 /* ******************************************************************* */
 /* *** Protótipos das funções **************************************** */
@@ -109,16 +109,21 @@ void loop() {
     if( (millis() - tasks.last_100ms) > 100 ){
         tasks.last_100ms = millis();
 
+        // Teste do estado em IRQ_ENC_A ou IRQ_ENC_B
         if( digitalRead(IRQ_ENC_A) || digitalRead(IRQ_ENC_B))
              digitalWrite(LED, HIGH);
         else digitalWrite(LED, LOW);
 
+        // Transmite apenas quando houve incremento na contagem
+        // de quebras de barreira no Encoder A.
         if( count_enc_a > prev_enc_a ){
             prev_enc_a = count_enc_a;
             Serial.print("Enc. A: ");
             Serial.println(count_enc_a);
         }
         
+        // Transmite apenas quando houve incremento na contagem
+        // de quebras de barreira no Encoder B.
         if( count_enc_b > prev_enc_b ){
             prev_enc_b = count_enc_b;
             Serial.print("Enc. B: ");
@@ -141,13 +146,24 @@ void loop() {
 /* ******************************************************************* */
 /* *** FUNÇÕES (implementações) ************************************** */
 
+/*  As funções que tratam pedidos de interrupção não devem receber 
+ *  argumentos nem possuir retorno. Devem ser enxutas, executando 
+ *  somente operações que são realmente necessárias. Deve-se evitar
+ *  delays, rotinas de comunicação (como por ex. Serial) e loops
+ *  demorados. As interrupçoes do uC são desabilitadas no início da
+ *  rotina para evitar que ocorra outros pedidos de interrupção 
+ *  enquanto um está sendo atendido.
+*/
+
+// Trata a chamada de interrupção acionada pelo Encoder A
 void task_irq_encoder_a(){
     
-    noInterrupts();
-    count_enc_a++;
-    interrupts();
+    noInterrupts();    // Desabilita todas as interrupções do uC
+    count_enc_a++;     // Altera valor de uma variável global
+    interrupts();      // Reabilita todas as interrupções do uC
 }
 
+// Trata a chamada de interrupção acionada pelo Encoder B
 void task_irq_encoder_b(){
     
     noInterrupts();
