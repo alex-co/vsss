@@ -1,5 +1,5 @@
 /*
-*	Exemplo referente as questões 1.1a e 1.1b de Atividades.txt
+*    Exemplo referente as questões 1.1a e 1.1b de Atividades.txt
 * 
 *  - Escalonador sem chamadas de funções.
 *
@@ -12,6 +12,7 @@
 */
 /* ****************************************************************** */
 
+#include <avr/io.h>
 #include <avr/pgmspace.h>
 
 /* ****************************************************************** */
@@ -20,12 +21,12 @@
 // =================================================================== //
 // Ref Ex 1.1b - Descomentar somente uma das definições abaixo por vez:
 
-#define LED_08S		// LED pisca com ciclo de 0.8s
-//#define LED_16S		// LED pisca com ciclo de 1.6s
-//#define LED_32S		// LED pisca com ciclo de 3.2s
-//#define LED_20S		// LED pisca com ciclo de 2.0s
-//#define LED_40S		// LED pisca com ciclo de 4.0s
-//#define LED_80S		// LED pisca com ciclo de 8.0s
+#define LED_08S	        // LED pisca com ciclo de 0.8s
+//#define LED_16S         // LED pisca com ciclo de 1.6s
+//#define LED_32S         // LED pisca com ciclo de 3.2s
+//#define LED_20S         // LED pisca com ciclo de 2.0s
+//#define LED_40S         // LED pisca com ciclo de 4.0s
+//#define LED_80S         // LED pisca com ciclo de 8.0s
 
 // =================================================================== //
 
@@ -114,13 +115,13 @@ void loop() {
     if( (millis() - tasks.last_100ms) > 100 ){
         tasks.last_100ms = millis();
 
-		// Conta número de eventos de 100ms
-		#if  defined(LED_08S) || defined(LED_16S) || defined(LED_32S)
+        // Conta número de eventos de 100ms
+        #if  defined(LED_08S) || defined(LED_16S) || defined(LED_32S)
         blinker++;
         #endif
         
-    	// Pisca o LED com ciclo de 0.8s
-    	#ifdef LED_08S
+        // Pisca o LED com ciclo de 0.8s
+        #ifdef LED_08S
         digitalWrite(LED, bitRead(blinker, 2));
         if( !(blinker & B111) ){
             counter++;
@@ -135,7 +136,7 @@ void loop() {
             counter++;                  // os quatro últimos bits de 'blinker' forem zero.
             Serial.println(counter);
         }
-		#endif
+        #endif
 
        // Pisca o LED com ciclo de 3.2s
        #ifdef LED_32S
@@ -154,7 +155,7 @@ void loop() {
         tasks.last_1000ms = millis();
 
         // Conta número de eventos de 1000ms
-		#if  defined(LED_20S) || defined(LED_40S) || defined(LED_80S)
+        #if  defined(LED_20S) || defined(LED_40S) || defined(LED_80S)
         blinker++;
         #endif
         
