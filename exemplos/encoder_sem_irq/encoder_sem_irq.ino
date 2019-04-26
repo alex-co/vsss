@@ -144,9 +144,7 @@ void loop() {
 /* ******************************************************************* */
 /* *** FUNÇÕES (implementações) ************************************** */
 
-/**********************************************************************
- *
- * Faz contagem de interrupções na barreira óptica dos encoders.
+/* Faz contagem de interrupções na barreira óptica dos encoders.
  * - Note que count_enc_a, count_enc_b, aux_a, aux_b são todas variáveis
  *   globais, no entanto as duas primeiras são passadas por referência
  *   como parâmetros da função enquanto as duas últimas são acessadas
