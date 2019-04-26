@@ -1,5 +1,5 @@
 /*
-*	Exemplo referente a questão 1.4 de Atividades.txt
+*    Exemplo referente a questão 1.4 de Atividades.txt
 * 
 *  - Contagem de interrupções na barreira óptica dos encoders.
 *  - O LED da placa sinaliza o estado dos encoders.
@@ -58,12 +58,12 @@ typedef struct {
 
 TasksTCtr tasks;   // Contagem de tempo para execução de tarefas
 
-uint16_t count_enc_a = 0;
-uint16_t count_enc_b = 0;
-uint16_t prev_enc_a = 0;
-uint16_t prev_enc_b = 0;
-uint8_t  aux_a = 0;
-uint8_t  aux_b = 0;
+uint16_t count_enc_a = 0;    // Contagem de quebra de barreira do encoder A
+uint16_t count_enc_b = 0;    // Contagem de quebra de barreira do encoder B
+uint16_t prev_enc_a = 0;     // Auxiliar - Mudança de estado de count_enc_a
+uint16_t prev_enc_b = 0;     // Auxiliar - Mudança de estado de count_enc_b
+uint8_t  aux_a = 0;          // Auxiliar - mudança de estado em IRQ_ENC_A 
+uint8_t  aux_b = 0;          // Auxiliar - mudança de estado em IRQ_ENC_B
 
 
 /* ******************************************************************* */
@@ -106,17 +106,21 @@ void loop() {
     if( (millis() - tasks.last_100ms) > 100 ){
         tasks.last_100ms = millis();
 
-
+        // Teste do estado em IRQ_ENC_A ou IRQ_ENC_B 
         if( digitalRead(IRQ_ENC_A) || digitalRead(IRQ_ENC_B))
              digitalWrite(LED, HIGH);
         else digitalWrite(LED, LOW);
         
+        // Transmite apenas quando houve incremento na contagem
+        // de quebras de barreira no Encoder A.
         if( count_enc_a > prev_enc_a ){
             prev_enc_a = count_enc_a;
             Serial.print("Enc. A: ");
             Serial.println(count_enc_a);
         }
-        
+
+        // Transmite apenas quando houve incremento na contagem
+        // de quebras de barreira no Encoder B.
         if( count_enc_b > prev_enc_b ){
             prev_enc_b = count_enc_b;
             Serial.print("Enc. B: ");
@@ -140,18 +144,30 @@ void loop() {
 /* ******************************************************************* */
 /* *** FUNÇÕES (implementações) ************************************** */
 
+/**********************************************************************
+ *
+ * Faz contagem de interrupções na barreira óptica dos encoders.
+ * - Note que count_enc_a, count_enc_b, aux_a, aux_b são todas variáveis
+ *   globais, no entanto as duas primeiras são passadas por referência
+ *   como parâmetros da função enquanto as duas últimas são acessadas
+ *   diretamente. Passagem de parâmetro por referência é útil quando se
+ *   deseja alterar o conteúdo de variáveis locais fora do escopo a que 
+ *   pertencem.
+*/
 
 void status_encoders( uint16_t *count_enc_a, uint16_t *count_enc_b ) {
 
+    // Lê e armazena estado atual do Encoder A
     aux_a = aux_a << 1;
     aux_a |= digitalRead(IRQ_ENC_A);
-    
-    aux_b = aux_b << 1;
-    aux_b |= digitalRead(IRQ_ENC_B);
-
+    // Testa se houve transição 1=>0 (borda de descida)
     if( bitRead(aux_a,1) && !bitRead(aux_a,0) )
         *count_enc_a = *count_enc_a + 1;
-        
+
+    // Lê e armazena estado atual do Encoder B
+    aux_b = aux_b << 1;
+    aux_b |= digitalRead(IRQ_ENC_B);
+    // Testa se houve transição 1=>0 (borda de descida)
     if( bitRead(aux_b,1) && !bitRead(aux_b,0) )
         *count_enc_b = *count_enc_b + 1;
 
