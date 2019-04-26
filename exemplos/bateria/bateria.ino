@@ -1,9 +1,9 @@
 /*
-*	Exemplo referente a questão 1.3 de Atividades.txt
+*  Exemplo referente a questão 1.3 de Atividades.txt
 * 
 *  - Lê a tensão da bateria em mV e transmite via serial.
 * 
-*    Objetivo: Utilizar conversor analógico-digital.
+*  Objetivo: Utilizar conversor analógico-digital.
 *
 */
 /* ****************************************************************** */
@@ -71,7 +71,7 @@ void setup() {
 
     Serial.begin(115200);        // Inicialização da com. serial
     
-    analogReference(INTERNAL);   // Referência dos ADCs -> 1.1V
+    analogReference(INTERNAL);   // Referência dos ADCs (fundo de escala = 1.1V)
     
 }
 
@@ -122,12 +122,15 @@ uint16_t get_volt_bat( ) {
 
     uint16_t adc =  0;
 
-	// Valor lido pelo ADC = Vcc/10
+    // Cada valor lido pelo ADC faz referência a 
+    // 1/10 do valor de tensão real das baterias.
     for (int i = 0; i < 10; i++){
         adc += analogRead(VOLT_BAT);
         delayMicroseconds(100);
     }
-    
+    // Fundo de escala do ADC = 1.1V
+    // Resolução do ADC = 2^10
+    // Resultado em milivolts
     return (uint16_t)((adc*1.1/1023.0)*1000.0);
 
 }
