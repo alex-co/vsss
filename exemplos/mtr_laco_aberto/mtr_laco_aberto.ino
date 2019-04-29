@@ -89,7 +89,9 @@ uint16_t get_volt_bat( void );
 
 void setup() {
 
-    Serial.begin(115200);  // Inicialização da com. serial
+    Serial.begin(115200);      // Inicialização da com. serial
+    
+    analogReference(INTERNAL); // Referência dos ADCs (fundo de escala = 1.1V)
     
     // Inicialização dos pinos de controle da Ponte H
     pinMode(HBRID_EN, OUTPUT);    // Habilita ponte H
@@ -137,7 +139,12 @@ void loop() {
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-        set_pwm_max();
+        Serial.print("Bateria: ");
+        Serial.println(get_volt_bat());
+
+        motor.config.pwm_max = set_pwm_max();
+        Serial.print("PWM max.: ");
+        Serial.println(motor.config.pwm_max);
     }
     // ******************************************************* //
 }
@@ -176,10 +183,12 @@ bool is_motor_locked( uint8_t mtr ) {
 }
 
 /* *********************************************************************
- * Ajusta o valor de PWM máximo baseado na da tensão da bateria
+ * Ajusta o valor de PWM máximo baseado na da tensão da bateria para
+ * que o motor trabalhe com 5 volts.
  */
 uint8_t set_pwm_max() {
     
+    return (uint8_t)((255.0 * 5.0 * 1000.0)/get_volt_bat());
 }
 
 /* *********************************************************************
@@ -198,7 +207,7 @@ uint16_t get_volt_bat() {
     // Fundo de escala do ADC = 1.1V
     // Resolução do ADC = 10 bits (2^10)
     // Resultado em milivolts
-    return (uint16_t)((adc*1.1/1023.0)*1000.0);
+    return (uint16_t)((adc * 1.1/1023.0) * 1000.0);
 }
 
 
