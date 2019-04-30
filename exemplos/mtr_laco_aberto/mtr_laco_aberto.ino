@@ -142,7 +142,6 @@ void loop() {
         Serial.print("Bateria: ");
         Serial.println(get_volt_bat());
 
-        motor.config.pwm_max = set_pwm_max();
         Serial.print("PWM max.: ");
         Serial.println(motor.config.pwm_max);
     }
@@ -188,7 +187,8 @@ bool is_motor_locked( uint8_t mtr ) {
  */
 uint8_t set_pwm_max() {
     
-    return (uint8_t)((255.0 * 5.0 * 1000.0)/get_volt_bat());
+    motor.config.pwm_max = (uint8_t)((255.0 * 5.0 * 1000.0)/get_volt_bat());
+    return motor.config.pwm_max;
 }
 
 /* *********************************************************************
