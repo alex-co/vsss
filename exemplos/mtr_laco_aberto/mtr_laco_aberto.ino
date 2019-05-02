@@ -100,9 +100,8 @@ void setup() {
     analogReference(INTERNAL); // Referência dos ADCs (fundo de escala = 1.1V)
     
     // Inicialização dos pinos de controle da Ponte H
-    pinMode(HBRID_EN, OUTPUT);    // Habilita ponte H
-    digitalWrite(HBRID_EN, HIGH); // 
-    
+    pinMode(HBRID_EN, OUTPUT);    // 
+    digitalWrite(HBRID_EN, HIGH); // Habilita ponte H
     pinMode(MTR_AIN1, OUTPUT);    // Bit 0 - Controle da ponte H do Motor A
     pinMode(MTR_AIN2, OUTPUT);    // Bit 1 - Controle da ponte H do Motor A
     pinMode(MTR_BIN1, OUTPUT);    // Bit 0 - Controle da ponte H do Motor B
@@ -110,7 +109,7 @@ void setup() {
     pinMode(MTR_PWMA, OUTPUT);    // Sinal de PWM para controle  do Motor A
     pinMode(MTR_PWMB, OUTPUT);    // Sinal de PWM para controle  do Motor B
     
-    motor.config.pwm_max = PWM_MAX; // PWM máximo para os motores
+    motor.config.pwm_max = PWM_MAX; // PWM máximo (inicial) dos motores
     set_motor_status( 0x0 );        // Motores parados e freio elétrico
 }
 
@@ -209,6 +208,7 @@ void set_motor_status( uint32_t status ) {
     
     // Altera configuração dos motores
     motor.status = status;
+    
     // Direção do Motor A
     digitalWrite(MTR_AIN1, bitRead(motor.config.dir_motor_A, 0));
     digitalWrite(MTR_AIN2, bitRead(motor.config.dir_motor_A, 1));
