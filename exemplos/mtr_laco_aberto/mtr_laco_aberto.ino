@@ -15,13 +15,17 @@
 /* ****************************************************************** */
 /* *** Definições diversas ****************************************** */
 
-#define SSPEED        115200   // Velocidade da interface serial
+#define SSPEED   115200 // Velocidade da interface serial
 
 #define PWM_MAX  0x9F   // PWM máx. p/ que os motores tenham aprox. 5v (Bat = 8.4v)
 #define PWM_MIN  0x0F   // PWM mín. para garantir um movimento mínimo dos motores
 
+// Se não houver inversão de polaridade na alimentação dos motores, 
+// descomentar a flag para que a inversão seja feita em software
+#define REV_MTR_B
+
 // Transforma caractere ascii em um número de 4 bits em hexadecimal.
-#define asc2hex(a) (((a) < 'a') ? ( (a) - '0' )  : ( ((a) - 'a')+10) )
+#define asc2hex(a) (((a) < 'a')?((a) - '0'):(((a) - 'a')+10))
     
 /* ****************************************************************** */
 /* Estas são as conexões de hardware mapeadas aos pinos do Arduino ** */
@@ -127,7 +131,7 @@ void loop() {
 
 
 
-    }
+    }// *** Fim tarefas 10ms ********************************* //
     
     // ******************************************************* //
     // Tarefas que devem ser executadas em intervalos de 100ms
@@ -152,46 +156,66 @@ void loop() {
                 set_motor_status(buffer);
                 
                 // Envia estado do motor para interface serial
-                Serial.print('PWM Máx.: ');
+                /*
+                Serial.print("PWM Máx.: ");
                 Serial.println(motor.config.pwm_max,HEX);
-                Serial.print('Dir MtrA: ');
+                Serial.print("Dir MtrA: ");
                 Serial.println(motor.config.dir_motor_A,BIN);
-                Serial.print('PWM MtrA: ');
+                Serial.print("PWM MtrA: ");
                 Serial.println(motor.config.pwm_motor_A,HEX);
-                Serial.print('Dir MtrB: ');
+                Serial.print("Dir MtrB: ");
                 Serial.println(motor.config.dir_motor_B,BIN);
-                Serial.print('PWM MtrB: ');
+                Serial.print("PWM MtrB: ");
                 Serial.println(motor.config.pwm_motor_B,HEX);
+                */
             }
         }
-        
         // *************************************************** //
-        //  Valores para teste via Serial (em hexadecimal)
-        //      02021F1F    Motor A = 10 31 | Motor B = 10 31
-        //      01013F3F    Motor A = 01 63 | Motor B = 01 63
+        //  Valores para teste (via Serial, em hexadecimal):
+        //
+        //      A1F1F    Motor A = 10 31 | Motor B = 10 31
+        //      53F3F    Motor A = 01 63 | Motor B = 01 63
+        //      90F0F    Motor A = 10 15 | Motor B = 01 15
+        //      62F2F    Motor A = 01 47 | Motor B = 10 47 
+        //      F2A0A    Motor A = 11 42 | Motor B = 11 10 
+        //      02B3C    Motor A = 00 43 | Motor B = 00 60 
         //
         // *************************************************** //
 
 
-    }
+    }// *** Fim tarefas 100 ms ******************************* //
     
     // ******************************************************* //
     // Tarefas que devem ser executadas em intervalos de 1000ms
     if( (millis() - tasks.last_1000ms) > 1000 ){
         tasks.last_1000ms = millis();
 
-        // Leitura da bateria
-//        Serial.print("Bateria: ");
-//        Serial.println(get_volt_bat());
-        
-        // Cálculo de PWM máximo
-//        motor.config.pwm_max = set_pwm_max();
-//        Serial.print("PWM max.: ");
-//        Serial.println(motor.config.pwm_max);
 
-    }
-    // ******************************************************* //
-}
+        // Envia leitura da bateria para interface serial
+        /*
+        Serial.print("Bateria: ");
+        Serial.println(get_volt_bat());
+        */
+        
+        // Envia cálculo de PWM máximo para interface serial
+        /*
+        motor.config.pwm_max = set_pwm_max();
+        Serial.print("PWM max.: ");
+        Serial.println(motor.config.pwm_max);
+        */
+        
+        // Envia info de motores com o freio elétrico ativado 
+        //   para interface serial.
+        /*
+        Serial.print("Freio Mtr A: ");
+        Serial.println(is_motor_locked(0)?"Ativado":"Desativado");
+        Serial.print("Freio Mtr B: ");
+        Serial.println(is_motor_locked(1)?"Ativado":"Desativado");
+        */
+
+    }// *** Fim tarefas 1000ms ******************************** //
+    
+}// *** Fim loop() ******************************************** //
 
 
 /* ******************************************************************* */
@@ -212,14 +236,22 @@ void set_motor_status( uint32_t status ) {
     // Direção do Motor A
     digitalWrite(MTR_AIN1, bitRead(motor.config.dir_motor_A, 0));
     digitalWrite(MTR_AIN2, bitRead(motor.config.dir_motor_A, 1));
+    
     // Direção do Motor B
+    //*** Motor B COM inversão ***//
+    #ifdef REV_MTR_B 
+    digitalWrite(MTR_BIN1, bitRead(motor.config.dir_motor_B, 1));
+    digitalWrite(MTR_BIN2, bitRead(motor.config.dir_motor_B, 0));
+    //*** Motor B SEM inversão ***//
+    #else 
     digitalWrite(MTR_BIN1, bitRead(motor.config.dir_motor_B, 0));
-    digitalWrite(MTR_BIN2, bitRead(motor.config.dir_motor_B, 1));
+    digitalWrite(MTR_BIN2, bitRead(motor.config.dir_motor_B, 1));   
+    #endif
     
     // Ajusta PWM máx. caso o valor atual seja menor que
     //   o equivalente para as baterias com carga total.
     if( motor.config.pwm_max < PWM_MAX )
-        motor.config.pwm_max = set_pwm_max();
+        set_pwm_max();
     
     // Limita PWM máximo do motor A
     if( motor.config.pwm_motor_A > motor.config.pwm_max )
@@ -229,7 +261,7 @@ void set_motor_status( uint32_t status ) {
     if( motor.config.pwm_motor_B > motor.config.pwm_max )
         motor.config.pwm_motor_B = motor.config.pwm_max;
         
-    // Escreve bits de PWM na ponte H
+    // Escreve valores de PWM na ponte H
     analogWrite(MTR_PWMA, motor.config.pwm_motor_A);
     analogWrite(MTR_PWMB, motor.config.pwm_motor_B);
     
