@@ -181,8 +181,52 @@ Considere as seguintes definições, contidas no template "robot/robot.ino":
 ========================================================================
 PARTE 3 - Atuação dos motores em laço fechado
 
-...
+Na atuação dos motores em laço fechado, as leituras dos encoders são usadas para ajustar
+dinamicamente as velocidades das rodas, desta forma, o ajuste de PWM dos motores é
+influenciado pela leitura de rotação das rodas num processo de realimentação que deve ser
+avaliado e atualizado em espaços regulares de tempo. Os motores usados nos robôs têm
+rotação máxima nominal fornecida pelo fabricante de 300 rpm (quando alimentados com 6Vcc).
 
+Considere as seguintes características mecânicas:
+
+#define WHEEL_TICKS 48   // Número de furos por roda
+#define WHEEL_DIAM  60   // Diâmetro da cada roda, em mm
+#define WHEELS_SPC  60   // Espaçamento entre rodas, em mm
+
+
+3.1) Usando as funções apropriadas já implementadas nas partes 1 e 2, implemente uma função
+     que ajuste simultaneamente as velocidades dos dois motores ( em mm/s ) e o sentido do 
+     deslocamento do robô.
+
+    void set_speed( uint32_t );
+    
+    
+3.2) Implemente uma função que retorne, simultaneamente, o sentido de deslocamento do robô
+     bem como as velocidades instantâneas dos dois motores ( em mm/s ).
+
+    uint32_t get_speed( void );
+    
+    
+3.3) Implemente uma função que receba o ângulo em graus e execute um processo de rotação no robô.
+
+     Requisitos: a) O robô deve rotacionar mesmo se não estiver em movimento;
+                 b) Se -90° <= θ <= 90° o robô não deve parar para rotacionar;
+                 c) Se -90° >  θ  > 90° o robô deve inverter o seu sentido de
+                    deslocamento, rotacionar com o ângulo complementar e retornar
+                    à velocidade com a qual se deslocava previamente.
+
+    void set_rotation( uint16_t );
+
+
+3.4) Implemente uma função que informe se o robô está executando um processo de rotação.
+
+    bool is_rotating( void );
+    
+    
+OBS: 
+Leve em consideração que um sistema mecânico possui um tempo de resposta relativamente alto
+(se comparado ao circuito eletrônico) para alcançar as condições de funcionamento definidas 
+pelos comandos do software.
 
 
 ========================================================================
