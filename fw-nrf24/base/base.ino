@@ -362,7 +362,7 @@ int8_t serial_tx( void ){
  */
 int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 
-    if( buf->tam == TAM_BUFFER )    // Erro, buffer cheio
+    if( is_radio_buffer_full(buf) )    // Erro, buffer cheio
         return -1;
     
     buf->msg[buf->tail].robot = msg->robot;
@@ -381,7 +381,7 @@ int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
  */
 int8_t read_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 
-    if( buf->tam == 0 )   // Erro, buffer vazio
+    if( is_radio_buffer_empty(buf) )   // Erro, buffer vazio
         return -1;
     msg->robot = buf->msg[buf->head].robot;
     msg->type  = buf->msg[buf->head].type;

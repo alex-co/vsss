@@ -106,6 +106,10 @@ TasksTCtr tasks;                 // Para o controle de tempo das tarefas
 //  Lê endereço de rede do dispositivo (robô) configurado via dip switch
 //  Retorna: Endereço de rede do robô [00..03]
     uint8_t  get_node_addr( void );
+    
+//  Processa a primeira mensagem da fila do buffer de SW de entrada 
+//  recebida do rádio e a encaminha seu tratador.
+    void dispatch_msg( void );
 
 //  Lê mensagens do buffer de HW e as armazena no buffer de SW
 //  Retorna: Número de mensagens recebidas.
@@ -182,7 +186,9 @@ void loop() {
     if( (millis() - tasks.last_10ms) > 10 ){
         tasks.last_10ms = millis();
 
-
+        radio_rx();      //  Rádio     =>  rx_buffer
+        dispatch_msg();  //  rx_buffer =>  tx_buffer
+        radio_tx();      //  tx_buffer =>  Rádio
 
     }
 
@@ -214,9 +220,26 @@ void loop() {
 /* *********************************************************************
  * Lê endereço de rede do dispositivo (robô) configurado via dip switch
  */
-uint8_t get_node_addr(){
+uint8_t get_node_addr( void ){
+
+    // Usar implementação da atividade 1.2
 
     return 01;
+}
+
+
+/* *********************************************************************
+ * Processa a primeira mensagem da fila do buffer de SW de entrada 
+ * recebida do rádio e a encaminha seu tratador.
+ */
+void dispatch_msg( void ){
+    
+    // Remove uma mensagem da fila de entrada (se existir) 
+    //  e a coloca na fila de saída. 
+    
+    TRadioMsg msg;
+    read_msg_radio_buffer(&rx_buffer, &msg);
+    write_msg_radio_buffer(&tx_buffer, &msg);
 }
 
 
@@ -266,7 +289,7 @@ uint8_t radio_tx( void ){
  */
 int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 
-    if( buf->tam == TAM_BUFFER )    // Erro, buffer cheio
+    if( is_radio_buffer_full(buf) )    // Erro, buffer cheio
         return -1;
     buf->msg[buf->tail].type = msg->type;
     buf->msg[buf->tail].data = msg->data;
@@ -282,7 +305,7 @@ int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
  */
 int8_t read_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 
-    if( buf->tam == 0 )   // Erro, buffer vazio
+    if( is_radio_buffer_empty(buf) )   // Erro, buffer vazio
         return -1;
     msg->type = buf->msg[buf->head].type;
     msg->data = buf->msg[buf->head].data;
