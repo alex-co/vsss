@@ -185,7 +185,8 @@ void loop() {
     // Tarefas que devem ser executadas em intervalos de 10ms
     if( (millis() - tasks.last_10ms) > 10 ){
         tasks.last_10ms = millis();
-
+        
+    //  Função de gateway PC <=> robôs
         radio_rx();      //  Rádio     =>  rx_buffer
         dispatch_msg();  //  rx_buffer =>  tx_buffer
         radio_tx();      //  tx_buffer =>  Rádio
@@ -235,7 +236,7 @@ uint8_t get_node_addr( void ){
 void dispatch_msg( void ){
     
     // Remove uma mensagem da fila de entrada (se existir) 
-    //  e a coloca na fila de saída. 
+    //  e a coloca na fila de saída.
     
     TRadioMsg msg;
     read_msg_radio_buffer(&rx_buffer, &msg);
