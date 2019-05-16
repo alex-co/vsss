@@ -5,9 +5,11 @@
 ### **Conteúdo deste repositório:**
 
 
-**[base](base/):** documentação e firmware do nó base;  
+**[base](base/):** documentação e sketch de base para o firmware do nó base;  
 
-**[robot](robot/):** documentação e firmware dos robôs. 
+**[robot](robot/):** documentação e sketch de base para o firmware dos robôs. 
+
+**[fw-nrf24](fw-nrf24/):** adicionado suporte para o transceiver nRF24L01 nos sketches de base. 
 
 **[img](img/):** imagens diversas (informativas e integrantes da documentação).
 
