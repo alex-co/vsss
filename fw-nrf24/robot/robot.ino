@@ -7,6 +7,7 @@
 /* ****************************************************************** */
 /* *** Definições diversas ****************************************** */
 
+
 // Descomente para inverter a rotação (somente) do Motor A
 // => Necessário com os motores montados simetricamente
 
@@ -14,6 +15,7 @@
 
 #define FULL_BAT 8000   // Valor em mV para bat. completamente carregada
 #define DEAD_BAT 6000   // Valor em mV para bat. esgotada ( recarregar )
+
 
 /* ****************************************************************** */
 /* Limitações de PWM e velocidade para uso no controlador PID ******* */
@@ -25,6 +27,7 @@
 
 /* ****************************************************************** */
 /* Estas são as conexões de hardware mapeadas aos pinos do Arduino ** */
+
 
 #define LED         4      // Led conectado a uma saída digital
 
@@ -47,8 +50,22 @@
 
 #define VOLT_BAT   A7      // Tensão da bateria -> Vcc/10
 
-/* ******************************************************************* */
-/* Definições de estruturas de dados ( funcionais, status e controle ) */
+
+/* ****************************************************************** */
+/* Macros diversas que podem ser úteis ****************************** */
+
+// Converte um número de 4 bits (hexadecimal) para caractere ascii. 
+#define hex2asc(a) (( a < 10 )  ? ( (a) + 0x30 ) : ( (a) + ('a'-10) ))
+
+// Converte um caractere ascii em um número de 4 bits (hexadecimal).
+#define asc2hex(a) (((a) < 'a') ? ( (a) - '0' )  : ( ((a) - 'a')+10) )
+
+// Lê um nibble de um inteiro de 32 bits dado seu índice (0 a 7).
+#define Nibble(a, i) ((unsigned)(((a) >> (28 - 4 * (i))) & 0xF))
+
+
+/* ****************************************************************** */
+/* Definições de estruturas de dados (funcionais, status e controle)  */
 
 
 typedef struct {
@@ -56,6 +73,7 @@ typedef struct {
     uint32_t last_100ms  = 0; // Controle do grupo das tarefas de 100ms
     uint32_t last_1000ms = 0; // Controle do grupo das tarefas de 1000ms
 } TasksTCtr;
+
 
 /* ******************************************************************* */
 /* *** Variáveis globais e instanciações ***************************** */
@@ -69,8 +87,8 @@ TasksTCtr tasks;		// Contagem de tempo para execução de tarefas
 /* ******************************************************************* */
 /* *** Protótipos das funções **************************************** */
 //
-// Obs: Este bloco não é necessário para compilação mas é útil como
-//      referência durante o processo de desenvolvimento.
+// Obs: Os protótipos não são necessários para compilação mas são úteis
+//      como referência durante o processo de desenvolvimento.
 
 
 

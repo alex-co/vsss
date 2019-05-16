@@ -12,8 +12,12 @@
 #define SERIAL_ECHO      0   // Eco da msg recebida (Prod: 0 | Debug: 1) 
 
 #define TAM_BUFFER      16   // Buffer de SW para o rádio
-#define BASE_ADDRESS    00   // Base tem sempre o endereço zero
+#define BASE_ADDRESS    00   // A "base" tem endereço fixo 00
 #define NETW_CHANNEL   100   // Canal padrão de operação do rádio
+
+
+/* ****************************************************************** */
+/* Estas são as conexões de hardware mapeadas aos pinos do Arduino ** */
 
 // Pinos de controle do módulo de rádio (independentes da SPI)
 
@@ -32,6 +36,9 @@
 #define L3GR         8   // Led 3 verde
 #define L3RD         9   // Led 3 vermelho
 
+
+/* ****************************************************************** */
+/* Macros diversas que podem ser úteis ****************************** */
 
 // Converte um número de 4 bits (hexadecimal) para caractere ascii. 
 #define hex2asc(a) (( a < 10 )  ? ( (a) + 0x30 ) : ( (a) + ('a'-10) ))
@@ -86,11 +93,14 @@ RF24Network network(radio);      // Instância da rede
 
 /* ****************************************************************** */
 /* *** Protótipos das funções *************************************** */
+//
+// Obs: Os protótipos não são necessários para compilação mas são úteis
+//      como referência durante o processo de desenvolvimento.
+
 
 //  Lê mensagens do buffer de HW e as armazena no buffer de SW
 //  Retorna: Número de mensagens recebidas.
     uint8_t radio_rx( void );
-
 
 //  Encaminha mensagens do buffer de SW para transmissão (rádio)
 //  Retorna: Número de mensagens transmitidas.
@@ -101,7 +111,6 @@ RF24Network network(radio);      // Instância da rede
 //  Retorna: Número de carateres recebidos.
     int8_t serial_rx( void );
 
-
 //  Lê as mensagens armazenadas no buffer de recepção do rádio, as 
 //  converte em string no formato CSV e as transmite pela int. serial.
 //  Retorna: Número de carateres transmitidos.
@@ -111,21 +120,17 @@ RF24Network network(radio);      // Instância da rede
 //  Retorna: Espaço livre.
     int8_t write_msg_radio_buffer( TRadioBuf&, TRadioMsg& );
 
-
 //  Lê (e remove) uma mensagem da fila do buffer de SW de rádio
 //  Retorna: Espaço ocupado.
     int8_t read_msg_radio_buffer( TRadioBuf&, TRadioMsg& );
-
 
 //  (Re)Inicializa buffer de SW de rádio
 //  Retorna: Nada
     void flush_radio_buffer( TRadioBuf& ); 
 
-
 //  Verifica se o buffer de SW de rádio está cheio
 //  Retorna: 1 => buffer cheio | 0 => caso contrário
     bool is_radio_buffer_full( TRadioBuf& );
-
 
 //  Verifica se o buffer de SW de rádio está vazio
 //  Retorna: 1 => buffer vazio | 0 => caso contrário
@@ -168,8 +173,6 @@ void setup() {
 
     // Sinaliza inicialização via serial
     //Serial.print("A;0;0\n");
-
-
 
 }
 
