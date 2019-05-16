@@ -4,12 +4,12 @@
 #include <RF24.h>
 #include <SPI.h>
 
-/* ************************************************************************* */
-/* *** Definições diversas ************************************************* */
+/* ****************************************************************** */
+/* *** Definições diversas ****************************************** */
 
 
-#define SSPEED        115200   // Velocidade da interface serial
-#define SERIAL_ECHO        0   // Eco da msg recebida (Prod: 0 | Debug: 1) 
+#define SSPEED      115200   // Velocidade da interface serial
+#define SERIAL_ECHO      0   // Eco da msg recebida (Prod: 0 | Debug: 1) 
 
 #define TAM_BUFFER      16   // Buffer de SW para o rádio
 #define BASE_ADDRESS    00   // Base tem sempre o endereço zero
@@ -20,7 +20,7 @@
 #define RADIO_CE    A0   // Pino CE do módulo de rádio
 #define RADIO_CS    A1   // Pino CS do módulo do rádio
 #define RADIO_PWR   A2   // Liga/Desl. módulo de rádio
-#define RADIO_IRQ    2   // Pino de IRQ do módulo de rádio
+#define RADIO_IRQ    2   // IRQ do módulo de rádio
 
 // LEDs de sinalização. 
 // Obs: Os LEDs vermelhos estão conectados a pinos com PWM.
@@ -33,21 +33,21 @@
 #define L3RD         9   // Led 3 vermelho
 
 
-// Transforma um número de 4 bits em hexadecimal para caractere ascii. 
+// Converte um número de 4 bits (hexadecimal) para caractere ascii. 
 #define hex2asc(a) (( a < 10 )  ? ( (a) + 0x30 ) : ( (a) + ('a'-10) ))
 
-// Transforma caractere ascii em um número de 4 bits em hexadecimal.
+// Converte um caractere ascii em um número de 4 bits (hexadecimal).
 #define asc2hex(a) (((a) < 'a') ? ( (a) - '0' )  : ( ((a) - 'a')+10) )
 
 // Lê um nibble de um inteiro de 32 bits dado seu índice (0 a 7).
 #define Nibble(a, i) ((unsigned)(((a) >> (28 - 4 * (i))) & 0xF))
 
-/* ************************************************************************* */
-/* *** Definições de estruturas de dados *********************************** */
+/* ****************************************************************** */
+/* *** Definições de estruturas de dados **************************** */
 
 
 typedef struct {
-    uint8_t  robot;             // 1 byte  - Endereço do outro nó 
+    uint8_t  robot;             // 1 byte  - Endereço do robô (destino) 
     uint8_t  type;              // 1 byte  - Tipo da mensagem
     uint32_t data;              // 4 bytes - Dado da mensagem
 } TRadioMsg;
@@ -63,13 +63,13 @@ typedef struct {
 
 
 typedef struct {
-    uint32_t last_10ms  = 0;
-    uint32_t last_500ms = 0;
+    uint32_t last_10ms  = 0;   // Controle do grupo das tarefas de 10ms
+    uint32_t last_500ms = 0;   // Controle do grupo das tarefas de 500ms
 } TasksTCtr;
 
 
-/* ************************************************************************* */
-/* *** Variáveis globais e instanciações *********************************** */
+/* ****************************************************************** */
+/* *** Variáveis globais e instanciações **************************** */
 
 RF24 radio(RADIO_CE, RADIO_CS);  // Instância do rádio
 RF24Network network(radio);      // Instância da rede
@@ -84,8 +84,8 @@ RF24Network network(radio);      // Instância da rede
     TasksTCtr tasks;
 
 
-/* ************************************************************************* */
-/* *** Protótipos das funções ********************************************** */
+/* ****************************************************************** */
+/* *** Protótipos das funções *************************************** */
 
 //  Lê mensagens do buffer de HW e as armazena no buffer de SW
 //  Retorna: Número de mensagens recebidas.
@@ -132,8 +132,8 @@ RF24Network network(radio);      // Instância da rede
     bool is_radio_buffer_empty( TRadioBuf& );
 
 
-/* ************************************************************************* */
-/* *** SETUP *************************************************************** */
+/* ****************************************************************** */
+/* *** SETUP ******************************************************** */
 
 void setup() {
 
@@ -145,21 +145,19 @@ void setup() {
     for( int i=4; i < 10; i++ )
         pinMode( i, OUTPUT );
 
-    Serial.begin(SSPEED);               // Inicializa a interface serial
-    
-    SPI.begin();                        // Inicializa a interface SPI
-
-    radio.begin();                      // Inicializa o módulo de rádio 
+    Serial.begin(SSPEED);            // Inicializa a interface serial
+    SPI.begin();                     // Inicializa a interface SPI
+    radio.begin();                   // Inicializa o módulo de rádio 
 
     netw_channel = NETW_CHANNEL;
-    radio.setChannel(netw_channel);     // Canal da rede de rádio ( 0 - 125 );
-    radio.setPALevel(RF24_PA_MAX);      // Potência da transmissão em 0dB ( 1mW )
-//  radio.setDataRate(RF24_250KBPS);    // O padrão é 1Mbps
-    radio.setCRCLength(RF24_CRC_16);    // Tamanho do CRC: 8 ou 16 bits
-    radio.enableDynamicPayloads();      // Habilita mensagens de tamanho dinâmico
-    radio.setRetries(4,10);             // Reenvios (em HW): 4 * 250us = 1ms ; count: 10
-    radio.setAutoAck(true);             // AutoAck habilitado (implementado em HW)
-    radio.maskIRQ(1,1,0);               // Interrupção somente quando recebe pacotes
+    radio.setChannel(netw_channel);  // Canal da rede de rádio (0-125);
+    radio.setPALevel(RF24_PA_MAX);   // Potência de tx em 0dB (1mW)
+//  radio.setDataRate(RF24_250KBPS); // O padrão é 1Mbps
+    radio.setCRCLength(RF24_CRC_16); // Tamanho do CRC: 8 ou 16 bits
+    radio.enableDynamicPayloads();   // Habilita msgs de tam dinâmico
+    radio.setRetries(4,10);          // Reenvios (HW):4*250us=1ms;count:10
+    radio.setAutoAck(true);          // AutoAck habilitado (feito em HW)
+    radio.maskIRQ(1,1,0);            // Interrupção ao receber pacotes
 
     // Inicialização da rede
     network.begin(BASE_ADDRESS);
@@ -175,15 +173,15 @@ void setup() {
 
 }
 
-/* ************************************************************************* */
-/* *** LOOP PRINCIPAL ****************************************************** */
+/* ****************************************************************** */
+/* *** LOOP PRINCIPAL *********************************************** */
 
 void loop() {
     
     // Mantém a rede ativa
-    network.update();     
+    network.update();
     
-    // *********************************************************************
+    // *****************************************************************
     // Tarefas a serem executadas em intervalos de 10ms
      if( (millis() - tasks.last_10ms) > 10 ){
         tasks.last_10ms = millis();
@@ -194,7 +192,7 @@ void loop() {
         radio_tx();     //  tx_buffer =>  Rádio
 
     }
-    // *********************************************************************
+    // *****************************************************************
     // Tarefas a serem executadas em intervalos de 500ms
     if( (millis() - tasks.last_500ms) > 500 ){
         tasks.last_500ms = millis();
@@ -205,11 +203,11 @@ void loop() {
 
 }
 
-/* ************************************************************************* */
-/* *** FUNÇÕES (implementações) ******************************************** */
+/* ****************************************************************** */
+/* *** FUNÇÕES (implementações) ************************************* */
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Lê mensagens do buffer de HW (rádio) e as armazena no buffer de SW
  */
 uint8_t radio_rx( void ){
@@ -232,7 +230,7 @@ uint8_t radio_rx( void ){
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Encaminha mensagens do buffer de SW para transmissão (rádio)
  */
 uint8_t radio_tx( void ){
@@ -253,7 +251,7 @@ uint8_t radio_tx( void ){
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Lê um string recebido pela interface serial, transforma no padrão
  * de uma mensagem de rádio e coloca no buffer de transmissão.
  * 
@@ -351,25 +349,25 @@ int8_t serial_rx( void ){
  */
 int8_t serial_tx( void ){
     
-    uint8_t c = 0;
+    uint8_t i = 0;
     TRadioMsg msg;
     
     if( !is_radio_buffer_empty(&rx_buffer) ){
         
         read_msg_radio_buffer( &rx_buffer, &msg );
         
-        c += Serial.print((char)msg.type);
-        c += Serial.print(';');
-        c += Serial.print(msg.robot);
-        c += Serial.print(';');
-        c += Serial.print(msg.data, HEX);
-        c += Serial.print('\n');
+        i += Serial.print((char)msg.type);
+        i += Serial.print(';');
+        i += Serial.print(msg.robot);
+        i += Serial.print(';');
+        i += Serial.print(msg.data, HEX);
+        i += Serial.print('\n');
     }
-    return c;   // Número de caracteres transmitidos
+    return i;   // Número de caracteres transmitidos
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Insere uma mensagem na fila do buffer de SW do rádio
  */
 int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
@@ -389,7 +387,7 @@ int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Lê e apaga uma mensagem da fila do buffer de SW de rádio
  */
 int8_t read_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
@@ -407,7 +405,7 @@ int8_t read_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * (Re)Inicializa buffer de SW de rádio
  */
 void flush_radio_buffer( TRadioBuf *buf ) {
@@ -419,7 +417,7 @@ void flush_radio_buffer( TRadioBuf *buf ) {
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Verifica se o buffer de SW de rádio está cheio
  */
 bool is_radio_buffer_full( TRadioBuf *buf ){
@@ -428,7 +426,7 @@ bool is_radio_buffer_full( TRadioBuf *buf ){
 }
 
 
-/* ******************************************************************
+/* *********************************************************************
  * Verifica se o buffer de SW de rádio está vazio
  */
 bool is_radio_buffer_empty( TRadioBuf *buf ){
