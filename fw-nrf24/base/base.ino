@@ -12,7 +12,7 @@
 #define SERIAL_ECHO      0   // Eco da msg recebida (Prod: 0 | Debug: 1) 
 
 #define TAM_BUFFER      16   // Buffer de SW para o rádio
-#define BASE_ADDRESS    00   // A "base" tem endereço fixo 00
+#define BASE_ADDRESS    00   // Base tem o endereço 0 (em octal)
 #define NETW_CHANNEL   100   // Canal padrão de operação do rádio
 
 
@@ -54,9 +54,9 @@
 
 
 typedef struct {
-    uint8_t  robot;             // 1 byte  - Endereço do robô (destino) 
-    uint8_t  type;              // 1 byte  - Tipo da mensagem
-    uint32_t data;              // 4 bytes - Dado da mensagem
+    uint8_t  robot;   // 1 byte  - Endereço do robô (destino) 
+    uint8_t  type;    // 1 byte  - Tipo da mensagem
+    uint32_t data;    // 4 bytes - Dado da mensagem
 } TRadioMsg;
 
 
@@ -78,17 +78,13 @@ typedef struct {
 /* ****************************************************************** */
 /* *** Variáveis globais e instanciações **************************** */
 
+
 RF24 radio(RADIO_CE, RADIO_CS);  // Instância do rádio
 RF24Network network(radio);      // Instância da rede
 
-//  Canal de rádio da rede
-    uint8_t netw_channel;
-
-//  Buffers para mensagens do rádio (Rx & Tx)
-    TRadioBuf rx_buffer, tx_buffer;  
-
-//  Contagem de tempo para execução de tarefas
-    TasksTCtr tasks;
+uint8_t   netw_channel;          // Canal de rádio da rede
+TRadioBuf rx_buffer, tx_buffer;  // Buffers de SW do rádio (Rx & Tx)
+TasksTCtr tasks;                 // Para o controle de tempo das tarefas
 
 
 /* ****************************************************************** */
@@ -142,19 +138,17 @@ RF24Network network(radio);      // Instância da rede
 
 void setup() {
 
-    // Liga alimentação do módulo de rádio
-    pinMode(RADIO_PWR, OUTPUT);
+    pinMode(RADIO_PWR, OUTPUT);   // Liga alimentação do módulo de rádio
     digitalWrite(RADIO_PWR, HIGH);
 
-    // Define pinos dos LEDs como saída
-    for( int i=4; i < 10; i++ )
+    for( int i=4; i < 10; i++ )   // Define pinos dos LEDs como saída
         pinMode( i, OUTPUT );
 
     Serial.begin(SSPEED);            // Inicializa a interface serial
     SPI.begin();                     // Inicializa a interface SPI
     radio.begin();                   // Inicializa o módulo de rádio 
 
-    netw_channel = NETW_CHANNEL;
+    netw_channel = NETW_CHANNEL;     //
     radio.setChannel(netw_channel);  // Canal da rede de rádio (0-125);
     radio.setPALevel(RF24_PA_MAX);   // Potência de tx em 0dB (1mW)
 //  radio.setDataRate(RF24_250KBPS); // O padrão é 1Mbps
@@ -164,15 +158,10 @@ void setup() {
     radio.setAutoAck(true);          // AutoAck habilitado (feito em HW)
     radio.maskIRQ(1,1,0);            // Interrupção ao receber pacotes
 
-    // Inicialização da rede
-    network.begin(BASE_ADDRESS);
+    network.begin(BASE_ADDRESS);     // Inicialização do nó base na rede
 
-    // Inicialização dos buffers
-    flush_radio_buffer( &rx_buffer );
-    flush_radio_buffer( &tx_buffer );
-
-    // Sinaliza inicialização via serial
-    //Serial.print("A;0;0\n");
+    flush_radio_buffer(&rx_buffer);  // Inicialização dos buffers
+    flush_radio_buffer(&tx_buffer);  //
 
 }
 
@@ -228,8 +217,7 @@ uint8_t radio_rx( void ){
         m++;
     }
     rx_buffer.last_t = millis();
-    // Número de mensagens recebidas.
-    return m;
+    return m;   // Número de mensagens recebidas.
 }
 
 
@@ -249,9 +237,9 @@ uint8_t radio_tx( void ){
         m++;
     }
     tx_buffer.last_t = millis();
-    // Número de mensagens transmitidas.
-    return m;
+    return m;   // Número de mensagens transmitidas.
 }
+
 
 
 /* *********************************************************************
@@ -332,8 +320,7 @@ int8_t serial_rx( void ){
         // Escreve para o buffer de transmissão de rádio
         write_msg_radio_buffer(&tx_buffer, &msg);
     }
-    // Número de carateres recebidos
-    return i;
+    return i;   // Número de carateres recebidos
 }
 
 
@@ -385,8 +372,7 @@ int8_t write_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
     if( ++buf->tail == TAM_BUFFER ) 
         buf->tail = 0;
     buf->tam++;
-    // Retorna: espaço restante
-    return ( TAM_BUFFER - buf->tam );
+    return ( TAM_BUFFER - buf->tam );   // Espaço restante
 }
 
 
@@ -403,8 +389,7 @@ int8_t read_msg_radio_buffer( TRadioBuf *buf, TRadioMsg *msg ){
     if( ++buf->head == TAM_BUFFER ) 
         buf->head = 0;
     buf->tam--;
-    // Retorna: espaço ocupado
-    return buf->tam;
+    return buf->tam;    // Espaço ocupado
 }
 
 
