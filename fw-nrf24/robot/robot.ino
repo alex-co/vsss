@@ -239,8 +239,12 @@ void dispatch_msg( void ){
     //  e a coloca na fila de saída.
     
     TRadioMsg msg;
-    read_msg_radio_buffer(&rx_buffer, &msg);
-    write_msg_radio_buffer(&tx_buffer, &msg);
+    
+    if( !is_radio_buffer_empty( &rx_buffer ) ){
+        
+        read_msg_radio_buffer(&rx_buffer, &msg);
+        write_msg_radio_buffer(&tx_buffer, &msg);
+    }
 }
 
 
