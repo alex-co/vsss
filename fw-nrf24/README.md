@@ -59,4 +59,4 @@ O string que representa a mensagem deve ser codificado em ASCII e ter o seguinte
 | ;  | Separador de campos da mensagem |
 | '\n' | Sinaliza o final da mensagem |
 
-Obs: No *Monitor Serial" da IDE do Arduino ative a opção "Nova-linha" para que o caractere '\n' seja transmitido.
+Obs: No *Monitor Serial* da IDE do Arduino ative a opção "Nova-linha" para que o caractere '\n' seja transmitido.
