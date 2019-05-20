@@ -232,5 +232,45 @@ pelos comandos do software.
 ========================================================================
 PARTE 4 - Controlando o robô via rádio
 
-...
+A pasta "fw-nrf24" contém a base de firmware para os robôs e para o nó base com suporte a
+comunicação via rádio utilizando o módulo nRF24L01.
+As funções implementadas nas partes 1 a 3 podem ser usadas para dar funcionalidades ao robô.
 
+4.0) Leia o arquivo README.md contido na pasta "fw-nrf24".
+
+4.1) Carregue as bases de firmwares no robô e nó base da pasta "fw-nrf24" e teste suas
+     funcionalidades conforme descritas no arquivo README.md. Utilize o "Monitor Serial" 
+     da IDE do Arduino para enviar mensagens para o nó base. Se as mensagens forem enviadas
+     no formato correto e endereçadas ao robô com endereço 1, o "Monitor Serial" deverá
+     mostrar um "eco" da mensagem enviada, caso contrário, nenhuma resposta será mostrada.
+
+4.1) Inclua sua implementação da função "get_node_addr" na base de firmware do robô.
+
+4.2) Defina mensagens de forma apropriada para que o robô execute os seguintes comandos:
+
+    - Informar o endereço de rádio, quando solicitado.
+    - Informar a tensão da bateria, quando solicitado.
+    - Alterar o estado dos motores (direção e PWM).
+    - Alterar a velocidade do robô.
+    - Executar um processo de rotação.
+
+4.3) Firmware do robô: 
+     Altere a função "dispatch_msg" para que processe as mensagens definidas no item 4.2 
+     e execute os respectivos comandos.
+     
+4.4) Firmware do nó base:
+     Implemente a função "dispatch_msg" (com protótipo análogo ao do firmware do robô) para
+     que processe somente as mensagens que têm como destinatário o nó base (endereço 0).
+
+
+Ao final das etapas descritas acima deve ser obtido um firmware funcional.
+
+
+========================================================================
+PARTE 5 - Melhorando as funcionalidades do firmware ( A definir )
+
+- Controlador PID;
+- Monitoramento de robô ativo;
+- Monitoramento de estado das baterias;
+
+========================================================================
