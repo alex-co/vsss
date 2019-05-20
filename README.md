@@ -5,17 +5,17 @@
 ### **Conteúdo deste repositório:**
 
 
-**[base](base/):** documentação e sketch de base para o firmware do nó base;  
+**[base](base/):** Base para o firmware do nó base (ref. Atividades.txt - Partes 1 a 3);  
 
-**[robot](robot/):** documentação e sketch de base para o firmware dos robôs. 
+**[robot](robot/):** Base para o firmware dos robôs (ref. Atividades.txt - Partes 1 a 3); 
 
-**[fw-nrf24](fw-nrf24/):** adicionado suporte para o transceiver nRF24L01 nos sketches de base. 
+**[fw-nrf24](fw-nrf24/):** Bases de FW com suporte ao transceiver nRF24L01 (ref. Atividades.txt - Parte 4); 
 
-**[img](img/):** imagens diversas (informativas e integrantes da documentação).
+**[Atividades.txt](Atividades.txt):** Atividades práticas a serem desenvolvidas ao longo do semestre;
 
-**[exemplos](exemplos/):** exemplos didáticos e funcionais abrangendo os firmwares do robô e do rádio base. 
+**[exemplos](exemplos/):** Implementações de exemplos referentes às Partes 1 e 2 de Atividades.txt;
 
-**[Atividades.txt](Atividades.txt):** atividades práticas a serem desenvolvidas ao longo do semestre.
+**[img](img/):** Pasta com imagens diversas.
 
 ## Objeto e objetivo:
 
