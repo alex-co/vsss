@@ -1,27 +1,27 @@
 ## Suporte à comunicação via rádio
 
-Nas pastas *base* e *robo* encontram-se as bases dos firmwares do nó base e dos robôs 
-onde foram adicionados suporte à comunicação wireless bilateral através do transceiver 
+Nas pastas **base** e **robo** encontram-se modelos para os firmwares do nó base e dos robôs 
+onde foram adicionados suporte à comunicação bilateral via rádio através do transceiver 
 nRF24L01, bem como o gerenciamento de filas de recepção e transmissão em software.
 
-A implementação do *nó base* lhe proporciona a funcionalidade de um gateway transparente 
+A implementação do *nó base* conta com a funcionalidade de um gateway transparente 
 entre o PC e os robôs, ou seja, toda comunicação entre PC e robôs passa pelo nó base sem 
 que haja processamento do conteúdo da mensagem.
 
-A implementação do *robô* faz somente a função de eco. Mais especificamente, toda mensagem 
-recebida via rádio e armazenada na fila de entrada é colocada na fila de saída e retransmitida 
-ao nó base.
+A implementação do *robô* faz somente a função de *eco*. Mais especificamente, toda mensagem 
+recebida via rádio é armazenada na fila de entrada, posteriormente colocada na fila de saída e 
+retransmitida ao nó base.
 
 O *nó base* tem endereço de rádio "0" enquantos os robôs 1, 2 e 3 têm respectivamente os endereços 
-de rádio "1", "2" e "3" os quais são dados fisicamente via dipswitch em suas placas eletrônicas. 
+de rádio "1", "2" e "3", estes setados fisicamente via *dipswitch* em suas placas eletrônicas. 
 Uma representação da comunicação entre PC, nó base e robôs pode ser vista na figura abaixo.
 
 <img src="https://github.com/alex-co/vsss/blob/master/img/pc-base-robos.png" width="450">
 
 ### Bibliotecas:
 
-No modelo fornecido para a programação do nó *base* e dos nós *robôs* está implícito o uso de duas bibliotecas 
-relacionadas ao módulo de rádio:  
+No modelo fornecido para a programação do nó *base* e dos nós *robôs* usa duas bibliotecas 
+relacionadas ao módulo de rádio:
 - **RF24**: Responsável pela configuração do hardware e da comunicação do módulo de rádio com o Arduino.  
 - **RF24Network**: Responsável pela configuração e manutenção da rede formada pelos módulos de rádio.  
 
@@ -45,18 +45,18 @@ encontradas nos repositórios já configurados por padrão na IDE.
 
 As mensagens transmitidas/recebidas pelo PC devem ter um formato específico para que sejam tratadas
 pelo *nó base* e transformadas em mensagens de rádio. As mensagens enviadas pelos robôs, quando
-têm como destino o PC são transmitidas pelo nó base com o mesmo formato.
+têm como destino o PC são transmitidas pelo nó base no mesmo formato.
 
 O string que representa a mensagem deve ser codificado em ASCII e ter o seguinte formato:
 
 [A-Z] ; [0-3] ; [1 a 8 carateres (hexadecimal)] '\n'
  
-| Campo | Dado |
+|     |      |
 | --- | ---  |
 | [ A-Z ] | Tipo da mensagem |
-| [ 0-3 ] | Endereço de rádio |
-| [ 1 a 8 caracteres ] | Dado a ser enviado em hexadecimal |
+| [ 0-3 ] | Endereço de rádio (destino ou origem) |
+| [ 1 a 8 caracteres ] | Dado da mensagem (em hexadecimal) |
 | ;  | Separador de campos da mensagem |
-| '\n' | Sinaliza o final da mensagem |
+| '\n' | Sinalizador do final da mensagem |
 
 Obs: No *Monitor Serial* da IDE do Arduino ative a opção "Nova-linha" para que o caractere '\n' seja transmitido.
