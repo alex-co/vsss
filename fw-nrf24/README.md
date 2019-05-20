@@ -1,6 +1,6 @@
 ## Suporte à comunicação via rádio
 
-Nas pastas **base** e **robo** encontram-se modelos para os firmwares do nó base e dos robôs 
+Nas pastas **base** e **robot** encontram-se modelos para os firmwares do nó base e dos robôs 
 onde foram adicionados suporte à comunicação bilateral via rádio através do transceiver 
 nRF24L01, bem como o gerenciamento de filas de recepção e transmissão em software.
 
