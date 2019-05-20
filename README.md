@@ -5,9 +5,7 @@
 ### **Conteúdo deste repositório:**
 
 
-**[base](base/):** Template básico de FW do nó base (ref. Atividades.txt - Partes 1 a 3);  
-
-**[robot](robot/):** Template básico de FW dos robôs (ref. Atividades.txt - Partes 1 a 3); 
+**[fw-basico](fw-basico/):** Templates básicos de FW para o nó base e robô (ref. Atividades.txt - Partes 1 a 3);  
 
 **[fw-nrf24](fw-nrf24/):** Templates de FW com suporte ao transceiver nRF24L01 (ref. Atividades.txt - Parte 4); 
 
