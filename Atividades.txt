@@ -253,6 +253,8 @@ As funções implementadas nas partes 1 a 3 podem ser usadas para dar funcionali
     - Alterar o estado dos motores (direção e PWM).
     - Alterar a velocidade do robô.
     - Executar um processo de rotação.
+    
+    Ver APÊNDICE A : MENSAGENS FIRMWARE - Robô VSSS UFPR v.2019 (no final deste arquivo).
 
 4.3) Firmware do robô: 
      Altere a função "dispatch_msg" para que processe as mensagens definidas no item 4.2 
@@ -272,5 +274,90 @@ PARTE 5 - Melhorando as funcionalidades do firmware ( A definir )
 - Controlador PID;
 - Monitoramento de robô ativo;
 - Monitoramento de estado das baterias;
+
+
+========================================================================
+APÊNDICE A  
+MENSAGENS FIRMWARE - Robô VSSS UFPR v.2019
+
+A seguir estão informações sobre as mensagens que devem ser enviadas ao robô. 
+A estrutura da mensagem consistem em um ID (4 bits) que informa para qual robô é a mensagem.
+Consiste também em um char que identifica a função que está sendo enviada para o robô e os
+demais parâmetros são para dar funcionalidades específicas para a função passada em MSG.
+
+O formato da mensagem:
++--------+---------------+--------+---------------+---------------+
+| ID     | MSG           | PAD    | DATA          | DATA          |
+|--------|---------------|--------|---------------|---------------|
+| 4 bits | char (8 bits) | 4 bits | 8 bits        | 8 bits        |
++--------+---------------+--------+---------------+---------------+
+
+ID
+São 4 bits que contém a identificação única de cada robozinho. Essa configuração é feita
+analogicamente, nos pinos da placa. Serve para direcionar a qual robô é a mensagem.
+
+MSG
+É um char (8 bits) que vai dizer qual o tipo de dado (data) está sendo enviado. Pode ser os
+seguintes:
+
++-----+-----------------+------------------------------------------------------+
+| MSG | Nome            | Descrição                                            |
++-----+-----------------+------------------------------------------------------+
+|  M  | Mover           | Anda X mm na velocidade Y mm/s (ou cm?)              |
+|  R  | Rotacionar      | Gira em X° ou -X°                                    |
+|  S  | Velocidade      | (Speed)  Anda a Y mm/s indefinidamente               |
+|  P  | Parar           | Freio Elétrico                                       |
+|  W  | Gets            | Envia informações dos robôs (estado da bateria, etc) |
+|  L  | LEDs (Luzinhas) | Liga, desliga ou inverte estado de um LED            |
+|  D  | Debug           | Envia o estado da ponte H e o PWM de cada motor      |
++-----+-----------------+------------------------------------------------------+
+
+DATA
+São 2 campos de 8 bits. Nestes campos é onde passam os parâmetros para as funções.
+Em alguns casos os dois campos podem ser unificados em um campo de 16 bits.
+
+PRECEDÊNCIA
+Algumas funções possuem precedência sobre outras. As precedências precisam ser definidas
+conforme a necessidade do software.
+Ex: função R (rotacionar) tem precedência sobre S (speed).
+
+PAD
+Parâmetros adicionais para direcionar uma função há uma funcionalidade específica.
+
+EXEMPLOS DE MENSAGENS
+
+Mensagem D
+Endereço  Mensagem Ponte H  PWM                   PWM
++--------+---------+--------+----------------------+----------------------+
+| &      | D       | 1001   | 159 (potência máxima)| 159 (potência máxima)|
++--------+---------+--------+----------------------+----------------------+
+Robô irá girar em torno do seu próprio eixo na velocidade máxima.
+
+Mensagem M                   distância              velocidade
++--------+---------+--------+----------------------+----------------------+
+| &      | M       | xxxx   | 0 a 265 cm           | 0 a 265 cm/s         |
++--------+---------+--------+----------------------+----------------------+
+Robô irá se mover a quantidade de centímetros referenciada em linha reta 
+na velocidade referenciada.
+
+Mensagem P
++--------+---------+--------+----------------------+----------------------+
+| &      | P       | xxxx   | xxxxxxxx             | xxxxxxxx             |
++--------+---------+--------+----------------------+----------------------+
+Ordena que o robô pare.
+
+Mensagem S
++--------+---------+--------+---------------------------------------------+
+| &      | S       | 0000   | 0 a 500 mm/s                                |
++--------+---------+--------+---------------------------------------------+
+Robô irá se mover em linha reta com uma velocidade passada no parâmetro até 
+que receba um comando.
+
+Mensagem R
++--------+---------+--------+---------------------------------------------+
+| &      | S       | xxxx   | -32768 até +32767 graus                     |
++--------+---------+--------+---------------------------------------------+
+Robô irá girar em torno de seu próprio eixo.
+
 
 ========================================================================
